@@ -495,6 +495,12 @@
         // データ入出力
         function exportData() {
             try {
+                // 現在の日付を取得
+                const date = new Date().toISOString().split('T')[0];
+                
+                // ファイル名を生成（例：medical_records_2024-03-21.csv）
+                const fileName = `medical_records_${date}.csv`;
+                
                 const csv = records.map(record => {
                     // 各フィールドをダブルクォートで囲み、内部のダブルクォートは2重にする
                     const fields = [
@@ -515,7 +521,7 @@
                 const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = 'medical_records.csv';
+                link.download = fileName;  // 日付を含めたファイル名を使用
                 link.click();
             } catch (error) {
                 alert(ERROR_MESSAGES.export + error.message);
@@ -592,6 +598,7 @@
         const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
         const SYSTEM_PROMPT = `#あなたは経験豊富な総合内科医です。診療記録の内容を確認し、
 #実際の臨床で役立つ内容(診断、治療、フォローアップ）を箇条書きで10個
+#ミスや副作用などのリスクを見逃さず強調表示
 #限りなくコンパクトに。略語可
 #絵文字可
 `;
