@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>診療記録編集システム</title>
+    <style>
+        /* スタイル定義 */
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            font-size: 12px;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .form-group label {
+            flex: 0 0 120px;
+            padding-top: 8px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .button-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .button-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .button-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .button-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .button-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .button-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .button-warning {
+            background-color: #f1c40f;
+            color: white;
+        }
+
+        .button-warning:hover {
+            background-color: #f39c12;
+        }
+
+        .records-section {
+            margin-top: 30px;
+        }
+
+        .records-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .records-table th,
+        .records-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .records-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .records-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        @media (max-width: 768px) {
+            .form-group {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .form-group label {
+                flex: none;
+                width: 100%;
+                padding-top: 0;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button {
+                width: 100%;
+            }
+
+            .records-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        .required {
+            color: #e74c3c;
+            margin-left: 4px;
+        }
+
+        .form-group input:required,
+        .form-group textarea:required {
+            border-left: 3px solid #e74c3c;
+        }
+
+        .advice-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+
+        .advice-content {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            white-space: pre-wrap;
+        }
+
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+        </div>
+
+            <div class="form-section">
+                    <div class="form-group">
+                <label for="patientId">患者ID <span class="required">*</span></label>
+                <input type="text" id="patientId" required>
+                    </div>
+                    <div class="form-group">
+                <label for="patientName">患者氏名 <span class="required">*</span></label>
+                <input type="text" id="patientName" required>
+                    </div>
+                    <div class="form-group">
+                <label for="visitDate">診療日 <span class="required">*</span></label>
+                <input type="date" id="visitDate" required>
+                    </div>
+                    <div class="form-group">
+                <label for="problem">Problem list <span class="required">*</span></label>
+                <textarea id="problem" required></textarea>
+                    </div>
+                    <div class="form-group">
+                <label for="treatment">診察治療<span class="required">*</span></label>
+                <textarea id="treatment" rows="4" required></textarea>
+                    </div>
+
+            <!-- API Key Input -->
+                    <div class="form-group">
+                <label for="apiKey">OpenAI API Key</label>
+                <input type="password" id="apiKey" placeholder="sk-...">
+        </div>
+
+            <!-- AI Advice Section -->
+                    <div class="form-group">
+                <button type="button" id="getAdvice" class="btn btn-secondary">AIアドバイスを取得</button>
+                    </div>
+            <div id="adviceSection" class="advice-section" style="display: none;">
+                <h3>AIからのアドバイス</h3>
+                <div id="adviceContent" class="advice-content"></div>
+                </div>
+            </div>
+
+        <div class="button-group">
+            <button class="button button-primary" onclick="addRecord()">診療記録追加</button>
+            <button class="button button-warning" onclick="updateSelectedRecord()" id="updateButton" style="display: none;">更新</button>
+            <button class="button button-secondary" onclick="exportData()">データエクスポート</button>
+            <button class="button button-secondary" onclick="importData()">データインポート</button>
+            <button class="button button-danger" onclick="clearData()">データクリア</button>
+        </div>
+
+        <div class="records-section">
+            <h2>診療履歴</h2>
+            <table class="records-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>氏名</th>
+                        <th>診療日</th>
+                        <th>Problem list</th>
+                        <th>診察治療</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="recordsList"></tbody>
+            </table>
+            </div>
+        </div>
+
+    <div id="recordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>診療記録詳細</h2>
+            <div id="recordDetails"></div>
+        </div>
+    </div>
+
+    <script>
+        // 定数定義
+        const REQUIRED_FIELDS = ['patientId', 'patientName', 'visitDate', 'problem'];
+        const ERROR_MESSAGES = {
+            required: '患者ID、患者氏名、診療日、Problem listは必須項目です。',
+            export: 'エクスポート中にエラーが発生しました: ',
+            import: 'インポート中にエラーが発生しました: ',
+            clear: 'すべてのデータを削除しますか？',
+            cleared: 'データを削除しました',
+            update: '記録を更新しますか？',
+            updated: '記録を更新しました'
+        };
+
+        // データ管理
+        let records = [];
+        let selectedRecordId = null;
+
+        // ユーティリティ関数
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('ja-JP');
+        }
+
+        function validateRequiredFields() {
+            return REQUIRED_FIELDS.every(field => {
+                const element = document.getElementById(field);
+                return element && element.value.trim() !== '';
+            });
+        }
+
+        // データ操作関数
+        function addRecord() {
+            if (!validateRequiredFields()) {
+                alert(ERROR_MESSAGES.required);
+                return;
+            }
+
+            const record = {
+                id: generateId(),
+                patientId: document.getElementById('patientId').value,
+                patientName: document.getElementById('patientName').value,
+                visitDate: document.getElementById('visitDate').value,
+                problem: document.getElementById('problem').value,
+                treatment: document.getElementById('treatment').value
+            };
+
+            records.push(record);
+            updateRecordsList();
+            clearForm();
+        }
+
+        function updateSelectedRecord() {
+            if (!selectedRecordId) return;
+            if (!validateRequiredFields()) {
+                alert(ERROR_MESSAGES.required);
+                return;
+            }
+            
+            if (confirm(ERROR_MESSAGES.update)) {
+                const index = records.findIndex(r => r.id === selectedRecordId);
+                if (index !== -1) {
+                    records[index] = {
+                        id: selectedRecordId,
+                        patientId: document.getElementById('patientId').value,
+                        patientName: document.getElementById('patientName').value,
+                        visitDate: document.getElementById('visitDate').value,
+                        problem: document.getElementById('problem').value,
+                        treatment: document.getElementById('treatment').value
+                    };
+            updateRecordsList();
+                    clearForm();
+                    alert(ERROR_MESSAGES.updated);
+                }
+            }
+        }
+
+        function updateRecordsList() {
+            const tbody = document.getElementById('recordsList');
+            tbody.innerHTML = '';
+
+            records.forEach(record => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${record.patientId}</td>
+                    <td>${record.patientName}</td>
+                    <td>${formatDate(record.visitDate)}</td>
+                    <td>${record.problem}</td>
+                    <td>${record.treatment}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="button button-primary" onclick="selectRecord('${record.id}')">選択</button>
+                            <button class="button button-danger" onclick="deleteRecord('${record.id}')">削除</button>
+                    </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function selectRecord(id) {
+            const record = records.find(r => r.id === id);
+            if (!record) return;
+
+            selectedRecordId = id;
+            document.getElementById('patientId').value = record.patientId;
+            document.getElementById('patientName').value = record.patientName;
+            document.getElementById('visitDate').value = record.visitDate;
+            document.getElementById('problem').value = record.problem;
+            document.getElementById('treatment').value = record.treatment;
+
+            // 更新ボタンを表示
+            document.getElementById('updateButton').style.display = 'inline-block';
+        }
+
+        function clearForm() {
+            document.getElementById('patientId').value = '';
+            document.getElementById('patientName').value = '';
+            document.getElementById('visitDate').value = '';
+            document.getElementById('problem').value = '';
+            document.getElementById('treatment').value = '';
+            selectedRecordId = null;
+            document.getElementById('updateButton').style.display = 'none';
+        }
+
+        // モーダル操作
+        function viewRecord(id) {
+            const record = records.find(r => r.id === id);
+            if (!record) return;
+
+            const details = document.getElementById('recordDetails');
+            details.innerHTML = `
+                <p><strong>患者ID:</strong> ${record.patientId}</p>
+                <p><strong>患者氏名:</strong> ${record.patientName}</p>
+                <p><strong>診療日:</strong> ${formatDate(record.visitDate)}</p>
+                <p><strong>Problem list:</strong> ${record.problem}</p>
+                <p><strong>診察治療:</strong> ${record.treatment}</p>
+            `;
+
+            document.getElementById('recordModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('recordModal').style.display = 'none';
+        }
+
+        function deleteRecord(id) {
+            if (confirm('この記録を削除しますか？')) {
+                records = records.filter(record => record.id !== id);
+                updateRecordsList();
+            }
+        }
+
+        // データ入出力
+        function exportData() {
+            try {
+                const csv = records.map(record => 
+                    `${record.id},${record.patientId},${record.patientName},${record.visitDate},${record.problem},${record.treatment}`
+                ).join('\n');
+                
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'medical_records.csv';
+                            link.click();
+            } catch (error) {
+                alert(ERROR_MESSAGES.export + error.message);
+            }
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+            const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    try {
+                        const csv = event.target.result;
+                        const lines = csv.split('\n');
+                        records = lines.map(line => {
+                            const [id, patientId, patientName, visitDate, problem, treatment] = line.split(',');
+                            return { id, patientId, patientName, visitDate, problem, treatment };
+                        });
+                        updateRecordsList();
+                } catch (error) {
+                        alert(ERROR_MESSAGES.import + error.message);
+                }
+            };
+                
+            reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        function clearData() {
+            if (confirm(ERROR_MESSAGES.clear)) {
+                records = [];
+                updateRecordsList();
+                alert(ERROR_MESSAGES.cleared);
+            }
+        }
+
+        // OpenAI API関連の定数
+        const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+        const SYSTEM_PROMPT = `あなたは経験豊富な医師です。
+診療記録の内容を確認し、以下の観点からアドバイスを提供してください：
+1. 診断や治療方針の妥当性
+2. 追加で考慮すべき点
+3. 患者への説明やフォローアップの提案
+4. 医療記録の記載方法の改善点
+
+アドバイスは箇条書きで簡潔に記載し、専門用語は必要最小限に留めてください。`;
+
+        // AIアドバイス取得機能
+        async function getAIAdvice() {
+            const apiKey = document.getElementById('apiKey').value;
+            const problem = document.getElementById('problem').value;
+            const treatment = document.getElementById('treatment').value;
+
+            if (!apiKey) {
+                alert('API Keyを入力してください。');
+                return;
+            }
+
+            if (!problem && !treatment) {
+                alert('Problem listまたは診察治療の内容を入力してください。');
+                return;
+            }
+
+            const adviceSection = document.getElementById('adviceSection');
+            const adviceContent = document.getElementById('adviceContent');
+            const getAdviceButton = document.getElementById('getAdvice');
+
+            try {
+                // ボタンを無効化し、ローディング表示
+                getAdviceButton.disabled = true;
+                adviceSection.style.display = 'block';
+                adviceContent.innerHTML = '<div class="loading">アドバイスを生成中...</div>';
+
+                const response = await fetch(OPENAI_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4',
+                        messages: [
+                            { role: 'system', content: SYSTEM_PROMPT },
+                            { role: 'user', content: `Problem list: ${problem}\n\n診察治療: ${treatment}` }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 1000
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const advice = data.choices[0].message.content;
+                adviceContent.innerHTML = advice;
+
+            } catch (error) {
+                console.error('Error:', error);
+                adviceContent.innerHTML = `<div class="error">エラーが発生しました: ${error.message}</div>`;
+            } finally {
+                getAdviceButton.disabled = false;
+            }
+        }
+
+        // イベントリスナーの設定
+        document.getElementById('getAdvice').addEventListener('click', getAIAdvice);
+
+        // 初期化
+            updateRecordsList();
+
+        // ページ離脱時の確認
+        window.onbeforeunload = function() {
+            if (records.length > 0) {
+                return '変更が保存されていません。このページを離れますか？';
+            }
+        };
+    </script>
+</body>
+</html>
