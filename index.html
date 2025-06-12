@@ -64,6 +64,20 @@
             font-size: 12px;
         }
 
+        .model-select {
+            flex: 0.5;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .model-select:hover {
+            border-color: #3498db;
+        }
+
         .form-group textarea {
             height: 50px;
             resize: vertical;
@@ -249,6 +263,12 @@
             white-space: pre-wrap;
         }
 
+        .advice-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
         .loading {
             color: #666;
             font-style: italic;
@@ -291,16 +311,22 @@
                     <div class="form-group">
                 <label for="apiKey">OpenAI API Key</label>
                 <input type="password" id="apiKey" placeholder="sk-...">
-        </div>
+            </div>
+
+            <!-- Model Selection -->
+            <div class="form-group">
+                <label for="modelSelect">AIモデル</label>
+                <input type="text" id="modelSelect" class="model-select" value="gpt-4o" placeholder="例: gpt-4, gpt-3.5-turbo">
+            </div>
 
             <!-- AI Advice Section -->
                     <div class="form-group">
                 <button type="button" id="getAdvice" class="btn btn-secondary">AIアドバイスを取得</button>
                     </div>
             <div id="adviceSection" class="advice-section" style="display: none;">
-                <h3>AIからのアドバイス</h3>
+                <div class="advice-title">AIからのアドバイス</div>
                 <div id="adviceContent" class="advice-content"></div>
-                </div>
+            </div>
             </div>
 
         <div class="button-group">
@@ -501,28 +527,44 @@
                 // ファイル名を生成（例：medical_records_2024-03-21.csv）
                 const fileName = `medical_records_${date}.csv`;
                 
-                const csv = records.map(record => {
-                    // 各フィールドをダブルクォートで囲み、内部のダブルクォートは2重にする
-                    const fields = [
-                        record.id,
-                        record.patientId,
-                        record.patientName,
-                        record.visitDate,
-                        record.problem,
-                        record.treatment
-                    ].map(field => {
-                        // 改行を\nに変換し、ダブルクォートをエスケープ
-                        const escaped = String(field).replace(/"/g, '""').replace(/\n/g, '\\n');
-                        return `"${escaped}"`;
-                    });
-                    return fields.join(',');
-                }).join('\n');
+                // ヘッダー行を定義
+                const headers = ['ID', '患者ID', '患者氏名', '診療日', 'Problem list', '診察治療'];
                 
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                // CSVデータを生成
+                const csv = [
+                    // ヘッダー行を追加
+                    headers.join(','),
+                    // レコードデータを追加
+                    ...records.map(record => {
+                        // 各フィールドをダブルクォートで囲み、内部のダブルクォートは2重にする
+                        const fields = [
+                            record.id,
+                            record.patientId,
+                            record.patientName,
+                            record.visitDate,
+                            record.problem,
+                            record.treatment
+                        ].map(field => {
+                            // 改行を\nに変換し、ダブルクォートをエスケープ
+                            const escaped = String(field)
+                                .replace(/"/g, '""')  // ダブルクォートをエスケープ
+                                .replace(/\n/g, '\\n') // 改行をエスケープ
+                                .replace(/\r/g, '\\r'); // キャリッジリターンをエスケープ
+                            return `"${escaped}"`;
+                        });
+                        return fields.join(',');
+                    })
+                ].join('\n');
+                
+                // BOMを追加してUTF-8でエンコード
+                const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = fileName;  // 日付を含めたファイル名を使用
+                link.download = fileName;
                 link.click();
+                
+                // メモリリークを防ぐためにURLを解放
+                URL.revokeObjectURL(link.href);
             } catch (error) {
                 alert(ERROR_MESSAGES.export + error.message);
             }
@@ -541,7 +583,11 @@
                     try {
                         const csv = event.target.result;
                         const lines = csv.split('\n');
-                        records = lines.map(line => {
+                        
+                        // ヘッダー行をスキップ
+                        const dataLines = lines.slice(1);
+                        
+                        records = dataLines.map(line => {
                             // CSVパース処理
                             const fields = [];
                             let currentField = '';
@@ -569,18 +615,19 @@
                             // フィールドの処理
                             const [id, patientId, patientName, visitDate, problem, treatment] = fields.map(field => {
                                 // 改行を復元
-                                return field.replace(/\\n/g, '\n');
+                                return field.replace(/\\n/g, '\n').replace(/\\r/g, '\r');
                             });
                             
                             return { id, patientId, patientName, visitDate, problem, treatment };
-                        });
+                        }).filter(record => record.id); // 空行を除外
+                        
                         updateRecordsList();
                     } catch (error) {
                         alert(ERROR_MESSAGES.import + error.message);
                     }
                 };
                 
-                reader.readAsText(file);
+                reader.readAsText(file, 'UTF-8');
             };
             
             input.click();
@@ -597,10 +644,9 @@
         // OpenAI API関連の定数
         const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
         const SYSTEM_PROMPT = `#あなたは経験豊富な総合内科医です。診療記録の内容を確認し、
-#実際の臨床で役立つ内容(診断、治療、フォローアップ）を箇条書きで10個
-#ミスや副作用などのリスクを見逃さず強調表示
+#実際の外来臨床で、役立つ内容を、箇条書きで10個
+#ピットフォールやtipsを。
 #限りなくコンパクトに。略語可
-#絵文字可
 `;
 
         // AIアドバイス取得機能
@@ -608,6 +654,7 @@
             const apiKey = document.getElementById('apiKey').value;
             const problem = document.getElementById('problem').value;
             const treatment = document.getElementById('treatment').value;
+            const model = document.getElementById('modelSelect').value;
 
             if (!apiKey) {
                 alert('API Keyを入力してください。');
@@ -636,7 +683,7 @@
                         'Authorization': `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: 'gpt-4o',
+                        model: model,
                         messages: [
                             { role: 'system', content: SYSTEM_PROMPT },
                             { role: 'user', content: `Problem list: ${problem}\n\n診察治療: ${treatment}` }
