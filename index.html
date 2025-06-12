@@ -590,12 +590,11 @@
 
         // OpenAI API関連の定数
         const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-        const SYSTEM_PROMPT = `あなたは経験豊富な医師です。
-診療記録の内容を確認し、厳しく添削してください。以下の観点からアドバイスを提供してください：
-1. 診断や治療について注意すべき点
-2. フォローアップすべき事
-
-アドバイスは箇条書きで簡潔に、医学用語を使う事`;
+        const SYSTEM_PROMPT = `#あなたは経験豊富な総合内科医です。診療記録の内容を確認し、
+#実際の臨床で役立つ内容(診断、治療、フォローアップ）を箇条書きで10個
+#限りなくコンパクトに。略語可
+#絵文字可
+`;
 
         // AIアドバイス取得機能
         async function getAIAdvice() {
