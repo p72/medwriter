@@ -1,213 +1,173 @@
 <!DOCTYPE html>
+<!-- HTML5の文書タイプ宣言 - 最新のHTML標準を使用 -->
 <html lang="ja">
+<!-- 日本語のページであることを指定 -->
 <head>
+    <!-- 文字エンコーディングをUTF-8に設定 - 日本語文字を正しく表示するため -->
     <meta charset="UTF-8">
+    <!-- ビューポート設定 - モバイル端末での表示を最適化 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ページのタイトル - ブラウザのタブに表示される -->
     <title>MedWriter</title>
     <style>
-        /* スタイル定義 */
+        /* === CSS スタイル定義開始 === */
+        /* 全体のスタイル設定 */
         body {
-            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-            font-size: 12px;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
+            font-family: 'Helvetica Neue', Arial, sans-serif; /* フォントファミリーを設定 */
+            margin: 0; /* 外側の余白を0に */
+            padding: 20px; /* 内側の余白を20pxに */
+            background-color: #f5f5f5; /* 背景色を薄いグレーに */
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
+        /* ヘッダー部分のスタイル */
         .header {
-            text-align: center;
-            margin-bottom: 30px;
+            background-color: #4CAF50; /* ヘッダーの背景色を緑に */
+            color: white; /* テキストを白に */
+            padding: 20px; /* 内側の余白を20pxに */
+            text-align: center; /* テキストを中央揃えに */
+            margin-bottom: 20px; /* 下の余白を20pxに */
+            border-radius: 5px; /* 角を丸く */
         }
 
-        .header h1 {
-            color: #2c3e50;
-            margin: 0;
-            font-size: 1.5em;
+        /* メインコンテンツのスタイル */
+        .container {
+            max-width: 1200px; /* 最大幅を1200pxに */
+            margin: 0 auto; /* 左右の余白を自動で中央揃えに */
+            padding: 20px; /* 内側の余白を20pxに */
+            background-color: white; /* 背景色を白に */
+            border-radius: 5px; /* 角を丸く */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* 影をつける */
         }
 
-        .form-section {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
+        /* フォームのスタイル */
         .form-group {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
+            margin-bottom: 15px; /* 下の余白を15pxに */
         }
 
         .form-group label {
-            flex: 0 0 120px;
-            padding-top: 8px;
-            color: #2c3e50;
-            font-weight: bold;
+            display: block; /* ラベルをブロック要素に */
+            margin-bottom: 5px; /* 下の余白を5pxに */
+            color: #333; /* テキスト色を濃いグレーに */
         }
 
-        .form-group input,
-        .form-group textarea {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 12px;
+        .form-group input, .form-group textarea {
+            width: 100%; /* 幅を100%に */
+            padding: 8px; /* 内側の余白を8pxに */
+            border: 1px solid #ddd; /* 枠線を薄いグレーに */
+            border-radius: 4px; /* 角を丸く */
+            box-sizing: border-box; /* パディングを幅に含める */
         }
 
-        .model-select {
-            flex: 0.5;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 12px;
-            background-color: white;
-            cursor: pointer;
+        /* ボタンのスタイル */
+        .btn {
+            background-color: #4CAF50; /* 背景色を緑に */
+            color: white; /* テキストを白に */
+            padding: 10px 20px; /* 内側の余白を上下10px、左右20pxに */
+            border: none; /* 枠線を消す */
+            border-radius: 4px; /* 角を丸く */
+            cursor: pointer; /* カーソルをポインターに */
+            font-size: 16px; /* フォントサイズを16pxに */
         }
 
-        .model-select:hover {
-            border-color: #3498db;
+        .btn:hover {
+            background-color: #45a049; /* ホバー時の背景色を少し暗い緑に */
         }
 
-        .form-group textarea {
-            height: 50px;
-            resize: vertical;
+        /* テーブルのスタイル */
+        table {
+            width: 100%; /* 幅を100%に */
+            border-collapse: collapse; /* テーブルの枠線を結合 */
+            margin-top: 20px; /* 上の余白を20pxに */
         }
 
-        #treatment {
-            height: 100px;
+        th, td {
+            padding: 12px; /* 内側の余白を12pxに */
+            text-align: left; /* テキストを左揃えに */
+            border-bottom: 1px solid #ddd; /* 下の枠線を薄いグレーに */
         }
 
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+        th {
+            background-color: #f8f8f8; /* 背景色を薄いグレーに */
+            font-weight: bold; /* フォントを太字に */
         }
 
-        .button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
+        /* 検索ボックスのスタイル */
+        .search-box {
+            margin-bottom: 20px; /* 下の余白を20pxに */
+            padding: 10px; /* 内側の余白を10pxに */
+            background-color: #f8f8f8; /* 背景色を薄いグレーに */
+            border-radius: 4px; /* 角を丸く */
         }
 
-        .button-primary {
-            background-color: #3498db;
-            color: white;
+        .search-box input {
+            width: 100%; /* 幅を100%に */
+            padding: 8px; /* 内側の余白を8pxに */
+            border: 1px solid #ddd; /* 枠線を薄いグレーに */
+            border-radius: 4px; /* 角を丸く */
+            box-sizing: border-box; /* パディングを幅に含める */
         }
 
-        .button-primary:hover {
-            background-color: #2980b9;
+        /* 削除ボタンのスタイル */
+        .delete-btn {
+            background-color: #f44336; /* 背景色を赤に */
+            color: white; /* テキストを白に */
+            padding: 5px 10px; /* 内側の余白を上下5px、左右10pxに */
+            border: none; /* 枠線を消す */
+            border-radius: 3px; /* 角を丸く */
+            cursor: pointer; /* カーソルをポインターに */
         }
 
-        .button-secondary {
-            background-color: #95a5a6;
-            color: white;
+        .delete-btn:hover {
+            background-color: #da190b; /* ホバー時の背景色を少し暗い赤に */
         }
 
-        .button-secondary:hover {
-            background-color: #7f8c8d;
+        /* 編集ボタンのスタイル */
+        .edit-btn {
+            background-color: #2196F3; /* 背景色を青に */
+            color: white; /* テキストを白に */
+            padding: 5px 10px; /* 内側の余白を上下5px、左右10pxに */
+            border: none; /* 枠線を消す */
+            border-radius: 3px; /* 角を丸く */
+            cursor: pointer; /* カーソルをポインターに */
+            margin-right: 5px; /* 右の余白を5pxに */
         }
 
-        .button-danger {
-            background-color: #e74c3c;
-            color: white;
+        .edit-btn:hover {
+            background-color: #0b7dda; /* ホバー時の背景色を少し暗い青に */
         }
 
-        .button-danger:hover {
-            background-color: #c0392b;
-        }
-
-        .button-warning {
-            background-color: #f1c40f;
-            color: white;
-        }
-
-        .button-warning:hover {
-            background-color: #f39c12;
-        }
-
-        .records-section {
-            margin-top: 30px;
-        }
-
-        .records-section h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-
-        .records-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .records-table th,
-        .records-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .records-table th {
-            background-color: #f8f9fa;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .records-table tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
+        /* モーダルのスタイル */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            display: none; /* 初期状態では非表示 */
+            position: fixed; /* 位置を固定 */
+            z-index: 1; /* 重なり順を設定 */
+            left: 0; /* 左端に配置 */
+            top: 0; /* 上端に配置 */
+            width: 100%; /* 幅を100%に */
+            height: 100%; /* 高さを100%に */
+            background-color: rgba(0,0,0,0.4); /* 背景色を半透明の黒に */
         }
 
         .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 20px;
-            width: 80%;
-            max-width: 600px;
-            border-radius: 8px;
-            position: relative;
+            background-color: #fefefe; /* 背景色を白に */
+            margin: 15% auto; /* 上下の余白を15%、左右を自動で中央揃えに */
+            padding: 20px; /* 内側の余白を20pxに */
+            border: 1px solid #888; /* 枠線をグレーに */
+            width: 80%; /* 幅を80%に */
+            max-width: 500px; /* 最大幅を500pxに */
+            border-radius: 5px; /* 角を丸く */
         }
 
         .close {
-            position: absolute;
-            right: 20px;
-            top: 10px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
+            color: #aaa; /* 色を薄いグレーに */
+            float: right; /* 右寄せに */
+            font-size: 28px; /* フォントサイズを28pxに */
+            font-weight: bold; /* フォントを太字に */
+            cursor: pointer; /* カーソルをポインターに */
         }
 
         .close:hover {
-            color: #000;
+            color: black; /* ホバー時の色を黒に */
         }
 
         @media (max-width: 768px) {
@@ -281,66 +241,84 @@
     </style>
 </head>
 <body>
+    <!-- メインコンテナ - ページ全体のコンテンツを包含 -->
     <div class="container">
+        <!-- ヘッダーセクション - アプリケーションのタイトル表示 -->
         <div class="header">
             <h1>MedWriter</h1>
         </div>
 
-            <div class="form-section">
-                    <div class="form-group">
+        <!-- フォームセクション - 患者情報と診療内容の入力エリア -->
+        <div class="form-section">
+            <!-- 患者基本情報入力フィールド群 -->
+            <div class="form-group">
                 <label for="patientId">患者ID <span class="required">*</span></label>
                 <input type="text" id="patientId" required tabindex="1">
-                    </div>
-                    <div class="form-group">
+            </div>
+            <div class="form-group">
                 <label for="patientName">患者氏名 <span class="required">*</span></label>
                 <input type="text" id="patientName" required tabindex="2">
-                    </div>
-                    <div class="form-group">
+            </div>
+            <div class="form-group">
                 <label for="visitDate">診療日 <span class="required">*</span></label>
                 <input type="date" id="visitDate" required value="" tabindex="3">
-                    </div>
-                    <div class="form-group">
+            </div>
+            
+            <!-- 診療内容入力フィールド群 -->
+            <div class="form-group">
                 <label for="problem">Problem list <span class="required">*</span></label>
                 <textarea id="problem" required tabindex="4"></textarea>
-                    </div>
-                    <div class="form-group">
+            </div>
+            <div class="form-group">
                 <label for="treatment">診察治療<span class="required">*</span></label>
                 <textarea id="treatment" rows="4" required tabindex="5"></textarea>
-                    </div>
+            </div>
 
-            <!-- API Key Input -->
-                    <div class="form-group">
+            <!-- AI機能設定セクション -->
+            <div class="form-group">
                 <label for="apiKey">OpenAI API Key</label>
+                <!-- パスワードタイプでAPIキーを隠して入力 -->
                 <input type="password" id="apiKey" placeholder="sk-..." tabindex="-1">
             </div>
 
-            <!-- Model Selection -->
             <div class="form-group">
                 <label for="modelSelect">AIモデル</label>
+                <!-- 使用するAIモデルを指定（デフォルトはgpt-4o） -->
                 <input type="text" id="modelSelect" class="model-select" value="gpt-4o" placeholder="例: gpt-4, gpt-3.5-turbo" tabindex="-1">
             </div>
 
-            <!-- AI Advice Section -->
-                    <div class="form-group">
+            <!-- AIアドバイス取得ボタン -->
+            <div class="form-group">
                 <button type="button" id="getAdvice" class="btn btn-secondary" tabindex="-1">AIアドバイスを取得</button>
-                    </div>
+            </div>
+            
+            <!-- AIアドバイス表示エリア（初期状態では非表示） -->
             <div id="adviceSection" class="advice-section" style="display: none;">
                 <div class="advice-title">AIからのアドバイス</div>
                 <div id="adviceContent" class="advice-content"></div>
             </div>
             </div>
 
+        <!-- 操作ボタン群 - 記録の追加・更新・ファイル操作 -->
         <div class="button-group">
+            <!-- 新規記録追加ボタン -->
             <button class="button button-primary" onclick="addRecord()" tabindex="-1">診療記録追加</button>
+            <!-- 既存記録更新ボタン（記録選択時のみ表示） -->
             <button class="button button-warning" onclick="updateSelectedRecord()" id="updateButton" style="display: none;" tabindex="-1">更新</button>
+            <!-- データエクスポートボタン（CSV形式でダウンロード） -->
             <button class="button button-secondary" onclick="exportData()" tabindex="-1">データエクスポート</button>
+            <!-- データインポートボタン（CSVファイルから読み込み） -->
             <button class="button button-secondary" onclick="importData()" tabindex="-1">データインポート</button>
+            <!-- 全データ削除ボタン（確認ダイアログ付き） -->
             <button class="button button-danger" onclick="clearData()" tabindex="-1">データクリア</button>
         </div>
 
+        <!-- 診療履歴表示セクション - 保存された記録の一覧表示 -->
         <div class="records-section">
             <h2>診療履歴</h2>
+            <!-- 診療記録テーブル -->
             <table class="records-table">
+                <!-- テーブルヘッダー - 各列の項目名 -->
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -351,22 +329,33 @@
                         <th>操作</th>
                     </tr>
                 </thead>
+                <!-- テーブルボディ - JavaScriptで動的に記録を挿入 -->
                 <tbody id="recordsList"></tbody>
             </table>
-            </div>
+        </div>
         </div>
 
+    <!-- モーダルウィンドウ - 診療記録の詳細表示用ポップアップ -->
     <div id="recordModal" class="modal">
         <div class="modal-content">
+            <!-- モーダル閉じるボタン（×マーク） -->
             <span class="close" onclick="closeModal()">&times;</span>
             <h2>診療記録詳細</h2>
+            <!-- 選択された記録の詳細情報を表示するエリア -->
             <div id="recordDetails"></div>
         </div>
     </div>
 
     <script>
-        // 定数定義
+        // === JavaScript 処理開始 ===
+        
+        /* 定数定義 - アプリケーション全体で使用する固定値 */
+        
+        // 必須入力項目のフィールドID一覧
+        // バリデーション時にこの配列をチェックして入力漏れを防ぐ
         const REQUIRED_FIELDS = ['patientId', 'patientName', 'visitDate', 'problem'];
+        
+        // エラーメッセージ定数 - ユーザーに表示するメッセージを一元管理
         const ERROR_MESSAGES = {
             required: '患者ID、患者氏名、診療日、Problem listは必須項目です。',
             export: 'エクスポート中にエラーが発生しました: ',
@@ -377,35 +366,71 @@
             updated: '記録を更新しました'
         };
 
-        // データ管理
+        /* グローバル変数 - アプリケーション全体で共有するデータ */
+        
+        // 診療記録を保存する配列 - メモリ上でデータを管理
         let records = [];
+        // 現在選択中の記録のID - 更新機能で使用
         let selectedRecordId = null;
 
-        // ユーティリティ関数
+        /* === ユーティリティ関数群 === */
+        /* 汎用的な機能を提供する関数たち */
+        
+        /**
+         * 一意のIDを生成する関数
+         * 現在の時刻（ミリ秒）とランダム文字列を組み合わせて、
+         * 重複しないIDを作成する
+         * @returns {string} 生成された一意のID
+         */
         function generateId() {
+            // Date.now()で現在時刻（ミリ秒）を36進数に変換
+            // Math.random()でランダム文字列を生成して結合
             return Date.now().toString(36) + Math.random().toString(36).substr(2);
         }
 
+        /**
+         * 日付文字列を日本語形式にフォーマットする関数
+         * YYYY-MM-DD形式の日付を日本語の表示形式に変換
+         * @param {string} dateString - 変換する日付文字列
+         * @returns {string} 日本語形式の日付文字列
+         */
         function formatDate(dateString) {
             return new Date(dateString).toLocaleDateString('ja-JP');
         }
 
+        /**
+         * 必須項目の入力チェックを行う関数
+         * REQUIRED_FIELDS配列に定義された全てのフィールドが
+         * 入力されているかを確認する
+         * @returns {boolean} 全ての必須項目が入力済みならtrue
+         */
         function validateRequiredFields() {
+            // every()メソッドで全ての必須フィールドをチェック
             return REQUIRED_FIELDS.every(field => {
                 const element = document.getElementById(field);
+                // 要素が存在し、かつ値が空でないことを確認
                 return element && element.value.trim() !== '';
             });
         }
 
-        // データ操作関数
+        /* === データ操作関数群 === */
+        /* 診療記録の追加、更新、削除などの基本機能 */
+        
+        /**
+         * 新しい診療記録を追加する関数
+         * フォームの入力値を取得して、records配列に新しい記録を追加
+         * 必須項目のバリデーションも実行する
+         */
         function addRecord() {
+            // 必須項目のチェック - 未入力があればエラーメッセージを表示して終了
             if (!validateRequiredFields()) {
                 alert(ERROR_MESSAGES.required);
                 return;
             }
 
+            // フォームの各入力値を取得してレコードオブジェクトを作成
             const record = {
-                id: generateId(),
+                id: generateId(), // 一意のIDを生成
                 patientId: document.getElementById('patientId').value,
                 patientName: document.getElementById('patientName').value,
                 visitDate: document.getElementById('visitDate').value,
@@ -413,8 +438,11 @@
                 treatment: document.getElementById('treatment').value
             };
 
+            // records配列にレコードを追加
             records.push(record);
+            // 画面の記録一覧を更新
             updateRecordsList();
+            // フォームをクリア
             clearForm();
         }
 
@@ -519,13 +547,20 @@
             }
         }
 
-        // データ入出力
+        /* === データ入出力関数群 === */
+        /* ファイルのエクスポート・インポート機能 */
+        
+        /**
+         * 診療記録をCSVファイルとしてエクスポートする関数
+         * 現在メモリ上にある全ての記録をCSV形式でダウンロードする
+         * ファイル名には現在日付を含める
+         */
         function exportData() {
             try {
-                // 現在の日付を取得
+                // 現在の日付を取得（ISO形式からYYYY-MM-DD部分を抽出）
                 const date = new Date().toISOString().split('T')[0];
                 
-                // ファイル名を生成（例：medical_records_2024-03-21.csv）
+                // エクスポートファイル名を生成（例：medical_records_2024-03-21.csv）
                 const fileName = `medical_records_${date}.csv`;
                 
                 // ヘッダー行を定義
@@ -642,15 +677,25 @@
             }
         }
 
-        // OpenAI API関連の定数
+        /* === AI機能関連設定 === */
+        /* OpenAI APIを使用したアドバイス機能の設定と処理 */
+        
+        // OpenAI APIのエンドポイントURL
         const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+        
+        // AIに送信するシステムプロンプト（AIの役割と指示を定義）
+        // 経験豊富な総合内科医として、実用的なアドバイスを提供するよう指示
         const SYSTEM_PROMPT = `#あなたは経験豊富な総合内科医です。診療記録の内容を確認し、
 #実際の外来臨床で、役立つ内容を、箇条書きで10個
 #ピットフォールやtipsを。
 #限りなくコンパクトに。略語可
 `;
 
-        // AIアドバイス取得機能
+        /**
+         * OpenAI APIを使用してAIアドバイスを取得する非同期関数
+         * 入力されたProblem listと診察治療内容を基に、
+         * 臨床で役立つアドバイスを生成して表示する
+         */
         async function getAIAdvice() {
             const apiKey = document.getElementById('apiKey').value;
             const problem = document.getElementById('problem').value;
@@ -710,17 +755,31 @@
             }
         }
 
-        // イベントリスナーの設定
+        /* === イベントリスナーの設定 === */
+        /* ボタンクリック等のユーザー操作に対する処理を登録 */
+        
+        // AIアドバイス取得ボタンにクリックイベントを設定
         document.getElementById('getAdvice').addEventListener('click', getAIAdvice);
 
-        // 初期化
-            updateRecordsList();
+        /* === アプリケーション初期化処理 === */
+        /* ページ読み込み時に実行される初期設定 */
+        
+        // 診療記録一覧の表示を初期化（空の状態で表示）
+        updateRecordsList();
 
-        // 現在の日付を設定
+        // 診療日フィールドに現在の日付を自動設定
+        // valueAsDateを使用して今日の日付をデフォルト値として設定
         document.getElementById('visitDate').valueAsDate = new Date();
 
-        // ページ離脱時の確認
+        /* === ページ離脱時の処理 === */
+        
+        /**
+         * ページを離れる際の確認ダイアログ
+         * 未保存のデータがある場合に警告を表示して、
+         * 誤って作業内容を失うことを防ぐ
+         */
         window.onbeforeunload = function() {
+            // 記録が1件以上ある場合のみ確認ダイアログを表示
             if (records.length > 0) {
                 return '変更が保存されていません。このページを離れますか？';
             }
